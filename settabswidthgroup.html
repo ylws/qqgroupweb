@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<style type="text/css">
+			.trees{
+				float: left;
+				height: 420px;
+				position: relative;
+				width: 600px;
+			}
+			.trees .txtline{
+				float: left;
+				height: 20px;
+				width: 100%;
+			}
+			.trees .txtline .centertxt{
+				float: left;
+				height: 20px;
+				width: 96px;	
+			}
+			.trees .txtline .righttxt{
+				float: left;
+				font-size: 14px;
+				height: 20px;
+				width: 250px;	
+			}
+			.trees .txtline .lefttxt{
+				float: left;
+				font-size: 14px;
+				height: 20px;
+				width: 250px;	
+			}
+			.trees .txtline .righttxt span{
+				float: left;
+				width: auto;
+			}
+			.trees .txtline .righttxt span:last-child{
+				cursor: pointer;
+				float: right;
+				
+			}
+			.trees #search{
+				border:1px solid #ccc;
+				height: 30px;
+				left: 0;
+				outline: none;
+				position: absolute;
+				top: 20px;
+				text-indent: 10px;
+				width: 250px;	
+			}
+			
+			.trees .left{
+				border:1px solid #ccc;
+				float: left;
+				height: 370px;
+				margin-top: 30px;
+				width: 250px;	
+			}
+			.trees .left .lefttitle{
+				border-bottom:1px solid #ccc;
+				cursor: pointer;
+				float: left;
+				height: 25px;
+				line-height: 25px;
+				width: 100%;	
+			}
+			.trees .left .lefttitle .icon{
+				background: url(global_icon_2.png) 8px -65px no-repeat;
+				border-radius: 50%;
+				float: left;
+				height: 25px;
+				transform: rotate(30deg);
+				transform-origin: center;
+				width: 25px;
+			}
+			.trees .left .lefttitle .iconopen{
+				background: url(global_icon_2.png) 8px -65px no-repeat;
+				border-radius: 50%;
+				float: left;
+				height: 25px;
+				transform-origin: center;
+				width: 25px;
+			}
+			.trees .left .leftgroup{
+				display: none;
+				float: left;
+				width: 100%;	
+			}
+			.trees .left .line{
+				border-bottom:1px dashed #ccc;
+				cursor: pointer;
+				float: left;
+				height: 25px;
+				line-height: 25px;
+				overflow: hidden;
+				text-indent: 25px;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;	
+			}
+			.trees .left .line:last-child{
+				border-bottom:1px solid #ccc;
+			}
+			.trees .center{
+				float: left;
+				height: 100%;
+				text-align: center;
+				line-height: 400px;
+				width: 96px;	
+			}
+			.trees .right{
+				border:1px solid #ccc;
+				float: left;
+				height: 100%;
+				width: 250px;	
+			}
+			.trees .right .line{
+				border-bottom:1px solid #ccc;
+				cursor: pointer;
+				float: left;
+				height: 25px;
+				line-height: 25px;
+				text-align: center;
+				width: 100%;	
+			}
+		</style>
+		
+		<div class="trees">
+			<div class="txtline">
+				<div class="lefttxt">所有标签</div>
+				<div class="centertxt"></div>
+				<div class="righttxt">
+					<span>已添加到标签</span>
+					<span style="float: right;">移除全部</span>
+				</div>
+			</div>
+			
+			<input type="text" name="" id="search" placeholder="请输入标签名" />
+			<div class="left">
+				<div class="lefttitle">
+					<span class="icon"></span>
+					<span>title1</span>
+				</div>
+				<div class="leftgroup">
+					<div class="line" id="a00">00</div>
+					<div class="line" id="a11">11</div>
+					<div class="line" id="a21">21</div>
+				</div>
+				<div class="lefttitle">
+					<span class="icon"></span>
+					<span>title2</span>
+				</div>
+				<div class="leftgroup">
+					<div class="line" id="a22">22</div>
+					<div class="line" id="a33">33</div>
+					<div class="line" id="a44">44</div>
+				</div>
+				
+			</div>
+			<div class="center">添加到<div class="temptrees" style="display: none;"></div></div>
+			<div class="right">
+				
+			</div>
+		</div>
+		<script type="text/javascript">
+			function treesAppend(obj){
+				this.eq=obj['eq'],
+				this.parentClass=obj['parentClass'],
+				this.icon=obj['icon'][0],
+				this.iconopen=obj['icon'][1],
+				this.leftClass=obj['leftClass'],
+				this.titleClass=obj['titleClass'],
+				this.groupClass=obj['groupClass'],
+				this.rightClass=obj['rightClass'],
+				this.tempClass=obj['tempClass'],
+				this.sonClass=obj['sonClass'],
+				this.searchid=obj['searchid'];
+				this.rightidarr=[]
+				this.init();
+			}
+			treesAppend.prototype={
+				"getStyle":function(el, name ){
+				　 　 if(window.getComputedStyle) 
+				   {
+				　 　 　 return window.getComputedStyle(el, null)[name];
+				　 　 }
+					else
+					{
+				　 　 　 return el.currentStyle[name];
+				　 　 }
+				},
+				"parentEl":function(){
+					return document.getElementsByClassName(this.parentClass)[this.eq]
+				},
+				"init":function(){
+					var leftEl=this.parentEl().getElementsByClassName(this.leftClass)[0];
+					var rightEl=this.parentEl().getElementsByClassName(this.rightClass)[0];
+					this.treeleftclick(leftEl,rightEl);
+					this.keydownevents(leftEl,rightEl);
+				},
+				"treeleftclick":function(left,right,searchflag){
+					var _this=this;
+					var temphtml=this.parentEl().getElementsByClassName(this.tempClass)[0];
+					//左侧分组事件
+					var lefttitle=left.getElementsByClassName(this.titleClass);
+					for(var i=0;i<lefttitle.length;i++){
+						lefttitle[i].onclick=function(){			
+							var flag=_this.getStyle(this.nextElementSibling,"display");
+							if(flag=="none"||searchflag==true&&flag=="block"&&this.children[0].getAttribute("class")==_this.icon){
+								this.children[0].setAttribute("class",_this.iconopen);
+								this.nextElementSibling.style.display="block";
+								//左侧分组内容点击事件
+								var leftson=this.nextElementSibling.getElementsByClassName(_this.sonClass);
+								for(var j=0;j<leftson.length;j++){
+									leftson[j].onclick=function(){
+										if(_this.rightidarr.length==0)
+										{
+											_this.rightidarr.push(this.getAttribute("id"));
+											right.appendChild(this.cloneNode(true));
+											var rightobj=right.getElementsByClassName(_this.sonClass);
+											var lastrightchild=rightobj[rightobj.length-1];
+											var appendid=lastrightchild.getAttribute("id")
+											lastrightchild.removeAttribute("id");
+											lastrightchild.setAttribute("ids",appendid);
+											_this.treerightclick(rightobj,_this.rightidarr);
+										}
+										else
+										{
+											
+											var kk=0;
+											for(var k=0;k<_this.rightidarr.length;k++){
+												if(_this.rightidarr[k]==this.getAttribute("id")){
+													kk++
+												}
+											}
+											if(kk==0)
+											{
+												_this.rightidarr.push(this.getAttribute("id"));
+												right.appendChild(this.cloneNode(true));
+												var rightobj=right.getElementsByClassName(_this.sonClass);
+												var lastrightchild=rightobj[rightobj.length-1];
+												var appendid=lastrightchild.getAttribute("id")
+												lastrightchild.removeAttribute("id");
+												lastrightchild.setAttribute("ids",appendid);
+												_this.treerightclick(rightobj,_this.rightidarr);
+											}	
+										}
+									}
+								}
+							}
+							else{
+								this.children[0].setAttribute("class",_this.icon);
+								this.nextElementSibling.style.display="none";
+							}
+						}
+					}
+				},
+				"treerightclick":function(rightobj,rightidarr){
+					//右侧删除事件
+					for(var i=0;i<rightobj.length;i++){
+						rightobj[i].onclick=function(){
+							var thisid=this.getAttribute("ids");
+							var kk=0;
+							for(var j=0;j<rightidarr.length;j++){
+								if(rightidarr[j]==thisid){
+									rightidarr.splice(j,1);
+									this.remove();
+								}
+							}
+						}	
+					}
+				},
+				"keydownevents":function(left,right){
+					var _this=this;
+					var focusflag=false;
+					document.getElementById(this.searchid).onfocus=function(){
+						focusflag=true;
+					}
+					document.getElementById(this.searchid).onblur=function(){
+						focusflag=false;
+					}
+					document.onkeyup=function(e){
+						var ecode=parseInt(e.keyCode);
+						if(ecode>=48&&ecode<=105&&focusflag==true||ecode==8&&focusflag==true||ecode==46&&focusflag==true){
+							var getval=document.getElementById(_this.searchid).value;
+							getval=getval.replace(/\s+/g,"");//去除空格
+							if(getval==""){
+								var leftgroup=left.getElementsByClassName(_this.groupClass);
+								for(var i=0;i<leftgroup.length;i++){
+									var titleobj=leftgroup[i].previousElementSibling;
+									titleobj.style.display="block";
+									titleobj.children[0].setAttribute("class",_this.icon);
+									leftgroup[i].style.display="none";
+									var lineobj=leftgroup[i].getElementsByClassName(_this.sonClass);
+									for(var j=0,k=0;j<lineobj.length;j++){
+										lineobj[j].style.display="block";
+									}
+								}
+								_this.treeleftclick(left,right,false);
+							}
+							else{
+								var leftgroup=left.getElementsByClassName(_this.groupClass);
+								for(var i=0;i<leftgroup.length;i++){
+									var titleobj=leftgroup[i].previousElementSibling;
+									titleobj.click();
+									var titleiconclass=titleobj.children[0].getAttribute("class");
+									if(titleiconclass==_this.icon){
+										titleobj.children[0].setAttribute("class",_this.iconopen);
+									}
+									else{
+										
+									}
+									leftgroup[i].style.display="block";
+									var lineobj=leftgroup[i].getElementsByClassName(_this.sonClass);
+									for(var j=0,k=0;j<lineobj.length;j++){
+										lineobj[j].style.display="block";
+										var linename=lineobj[j].innerText;
+										if(linename.indexOf(getval)<0){
+											lineobj[j].style.display="none";
+											k++;
+										}
+										if(k==lineobj.length){
+											titleobj.style.display="none";
+										}
+										else{
+											titleobj.style.display="block";
+										}
+									}	
+								}
+								//_this.treeleftclick(left,right,true);
+							}
+						}
+						
+					}
+				}
+			}
+			new treesAppend({
+				"icon":["icon","iconopen"],
+				"parentClass":"trees",
+				"leftClass":"left",
+				"titleClass":"lefttitle",
+				"groupClass":"leftgroup",
+				"rightClass":"right",
+				"tempClass":"temptrees",
+				"sonClass":"line",
+				"eq":0,
+				"searchid":"search"
+			})
+		</script>
+	</body>
+</html>
